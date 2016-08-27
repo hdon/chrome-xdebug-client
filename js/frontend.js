@@ -265,15 +265,24 @@ $(function() {
 		$("#eval-content").text("...");
 		e.preventDefault();
 		var expression = $("input[name=eval-expression]").val();
-		History.push(expression);
-		var expression_wrapper = $("input[name=eval-expression-wrap]:checked").val();
-		if (expression_wrapper) {
-			expression = expression_wrapper + "(" + expression + ", true)";
-		}
-		expression = btoa(expression);
-		$("body").trigger("xdebug-eval", {
-			expression: expression
-		});
+    if (expression.substr(0,3) == '.b ')
+    {
+      $('body').trigger('xdebug-breakpoint_set-call', {
+        functionName: expression.substr(3)
+      });
+    }
+    else
+    {
+      History.push(expression);
+      var expression_wrapper = $("input[name=eval-expression-wrap]:checked").val();
+      if (expression_wrapper) {
+        expression = expression_wrapper + "(" + expression + ", true)";
+      }
+      expression = btoa(expression);
+      $("body").trigger("xdebug-eval", {
+        expression: expression
+      });
+    }
 	});
 
 	// don't hide eval console when trying to type or select

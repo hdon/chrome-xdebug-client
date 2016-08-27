@@ -395,6 +395,24 @@ $(function() {
 		send_command("stack_get");
 	});
 
+  /* There are six different breakpoint types:
+   * line, call, return, exception, conditional, watch
+   */
+	$("body").on("xdebug-breakpoint_set-call", function(event, data) {
+		var options = "-t call -m " + data.functionName;
+		if (data.hitValue) { options += " -h " + data.hitValue; }
+		if (data.operator) {
+			options += " -o " + data.operator;
+			if (data.condition) { options += " -- " + btoa(data.condition); }
+			send_command("breakpoint_remove", "-d " + data.breakpointToDelete, function() {
+				Breakpoints.unset(data.breakpointToDelete);
+				send_command("breakpoint_set", options);
+			});
+		} else {
+			send_command("breakpoint_set", options);
+		}
+	});
+
 	$("body").on("xdebug-breakpoint_set", function(event, data) {
 		var options = "-t line -f " + Global.fileNameCurrentlyLoaded + " -n " + data.lineno;
 		if (data.hitValue) { options += " -h " + data.hitValue; }
